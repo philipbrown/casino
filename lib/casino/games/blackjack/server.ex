@@ -36,12 +36,6 @@ defmodule Casino.Games.Blackjack.Server do
     {:ok, state}
   end
 
-  def handle_info({:start}, state) do
-    open_table(state)
-
-    {:noreply, state}
-  end
-
   def handle_cast({:add, count}, state) do
     open_table(count)
 
@@ -49,13 +43,27 @@ defmodule Casino.Games.Blackjack.Server do
   end
 
   def handle_cast({:remove}, state) do
-    state = close_table(state)
+    close_table(state)
 
     {:noreply, state}
   end
 
   def handle_call({:count}, _from, state) do
     {:reply, state, state}
+  end
+
+  def handle_info({:start}, state) do
+    open_table(state)
+
+    {:noreply, state}
+  end
+
+  def handle_info({:DOWN, _ref, :process, _pid, _reason}, state) do
+    {:noreply, state - 1}
+  end
+
+  def handle_info(_msg, state) do
+    {:noreply, state}
   end
 
   # Helpers
@@ -80,7 +88,7 @@ defmodule Casino.Games.Blackjack.Server do
       |> List.last
       |> close_table
 
-    state - 1
+      state
   end
   defp close_table({_, pid, _, _}) when is_pid(pid) do
     Supervisor.terminate_child(Casino.Games.Blackjack.TableSupervisor, pid)
