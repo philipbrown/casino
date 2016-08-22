@@ -46,10 +46,9 @@ defmodule Casino.Players.Server do
   end
 
   def handle_cast({:remove, id}, {players, refs}) do
-    {{_name, pid, ref}, players} = Map.pop(players, id)
+    {{_name, pid, _ref}, players} = Map.pop(players, id)
 
-    Process.exit(pid, :normal)
-    refs = Map.delete(refs, ref)
+    Process.exit(pid, :kill)
 
     {:noreply, {players, refs}}
   end
