@@ -5,7 +5,8 @@ defmodule Casino do
     import Supervisor.Spec, warn: false
 
     children = [
-       supervisor(Casino.PlayersSupervisor, [])
+      supervisor(Casino.PlayersSupervisor, []),
+      supervisor(Casino.GamesSupervisor, [])
     ]
 
     opts = [strategy: :one_for_one, name: Casino.Supervisor]
